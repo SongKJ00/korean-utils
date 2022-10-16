@@ -103,9 +103,17 @@
       (assoc syllable-with-jamo-indicies :syllable (jamo-indicies->syllable replaced-jamo-indicies)))
     syllable-with-jamo-indicies))
 
+(defn verify-jamo
+  [jamo]
+  (let [jamos (merge choseongs jungseongs jongseongs)]
+    (when-not (jamos jamo)
+      (throw (ex-info "Not valid jamo" {:cause (format "%s is not valid jamo" jamo)})))))
+
 (defn replace
   "주어진 문자열에서 match와 일치하는 자모를 replacement로 치환합니다."
   [s match replacement]
+  (verify-jamo match)
+  (verify-jamo replacement)
   (let [syllable-with-jamo-indicies (map ->syllable-with-jamo-indicies s)]
     (->> (map #(change-syllable % match replacement) syllable-with-jamo-indicies)
          (map :syllable)

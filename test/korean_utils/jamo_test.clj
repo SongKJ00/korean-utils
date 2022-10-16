@@ -17,8 +17,21 @@
   
   (testing "인풋 문자열에 한글 이외 문자가 섞여 있어도 자모는 정상적으로 치환되며, 나머지 문자는 그대로 유지된다."
     (is (= (jamo/replace "안녕하세요 Hello 123!!!" "ㅎ" "ㅇ")
-           "안녕아세요 Hello 123!!!"))))
+           "안녕아세요 Hello 123!!!")))
+  
+  (testing "match 파라미터가 정의된 자모가 아닌 경우, exception을 던진다."
+    (try
+      (jamo/replace "테스트 문자열" "a" "ㄱ")
+      (catch Exception e
+        (is (= (ex-data e)
+               {:cause "a is not valid jamo"})))))
+  
+  (testing "replacement 파라미터가 정의된 자모가 아닌 경우, exception을 던진다."
+    (try
+      (jamo/replace "테스트 문자열" "ㄱ" "b")
+      (catch Exception e
+        (is (= (ex-data e)
+               {:cause "b is not valid jamo"}))))))
 
 (comment
   (run-tests))
-
