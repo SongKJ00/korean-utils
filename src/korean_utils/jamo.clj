@@ -1,4 +1,5 @@
-(ns korean-jamo-substitution.core)
+(ns korean-utils.jamo
+  (:refer-clojure :exclude [replace]))
 
 (def unicode-offset 0xAC00) ;; 한글 유니코드 오프셋
 
@@ -102,7 +103,7 @@
       (assoc syllable-with-jamo-indicies :syllable (jamo-indicies->syllable replaced-jamo-indicies)))
     syllable-with-jamo-indicies))
 
-(defn replace-jamo
+(defn replace
   "주어진 문자열에서 match와 일치하는 자모를 replacement로 치환합니다."
   [s match replacement]
   (let [syllable-with-jamo-indicies (map ->syllable-with-jamo-indicies s)]
@@ -111,4 +112,4 @@
          (apply str))))
 
 (comment
-  (replace-jamo "안녕하세요 Hello 123" "ㅇ" "ㄱ"))
+  (replace "안녕하세요 Hello 123" "ㅇ" "ㄱ"))
