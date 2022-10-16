@@ -49,42 +49,42 @@
 
 (defn syllable->jamo-indices
   [syllable]
-  {:cho-idx (syllable->choseong-idx syllable)
+  {:cho-idx  (syllable->choseong-idx syllable)
    :jung-idx (syllable->jungseong-idx syllable)
    :jong-idx (syllable->jongseong-idx syllable)})
 
-(defn ->syllable-with-jamo-indicies
+(defn ->syllable-with-jamo-indices
   [syllable]
   (let [korean-syllable? (korean-syllable? syllable)]
     (cond-> {:syllable         syllable
              :korean-syllable? korean-syllable?}
       korean-syllable? (merge (syllable->jamo-indices syllable)))))
 
-(defn jamo->jamo-indicies
+(defn jamo->jamo-indices
   [jamo]
-  {:cho-idx (choseongs jamo)
+  {:cho-idx  (choseongs jamo)
    :jung-idx (jungseongs jamo)
    :jong-idx (jongseongs jamo)})
 
 (defn get-replaced-jamo-idx
-  [jamo-idx-type target-jamo-indicies match-jamo-indicies replacement-jamo-indicies]
-  (let [jamo-idx             (jamo-idx-type target-jamo-indicies)
-        match-jamo-idx       (jamo-idx-type match-jamo-indicies)
-        replacement-jamo-idx (jamo-idx-type replacement-jamo-indicies)]
+  [jamo-idx-type target-jamo-indices match-jamo-indices replacement-jamo-indices]
+  (let [jamo-idx             (jamo-idx-type target-jamo-indices)
+        match-jamo-idx       (jamo-idx-type match-jamo-indices)
+        replacement-jamo-idx (jamo-idx-type replacement-jamo-indices)]
     (if (and (= jamo-idx match-jamo-idx)
              (some? replacement-jamo-idx))
       replacement-jamo-idx
       jamo-idx)))
 
-(defn get-replaced-jamo-indicies
-  [target-jamo-indicies match-jamo-indicies replacement-jamo-indicies]
+(defn get-replaced-jamo-indices
+  [target-jamo-indices match-jamo-indices replacement-jamo-indices]
   (let [jamo-idx-types [:cho-idx :jung-idx :jong-idx]]
     (->> jamo-idx-types
-         (map #(get-replaced-jamo-idx % target-jamo-indicies match-jamo-indicies replacement-jamo-indicies))
+         (map #(get-replaced-jamo-idx % target-jamo-indices match-jamo-indices replacement-jamo-indices))
          (map vector jamo-idx-types)
          (into {}))))
 
-(defn jamo-indicies->syllable
+(defn jamo-indices->syllable
   [{:keys [cho-idx jung-idx jong-idx]}]
   (-> cho-idx
       (* 21)
@@ -95,13 +95,13 @@
       char))
 
 (defn change-syllable
-  [syllable-with-jamo-indicies match replacement]
-  (if (:korean-syllable? syllable-with-jamo-indicies)
-    (let [match-jamo-indicies       (jamo->jamo-indicies match)
-          replacement-jamo-indicies (jamo->jamo-indicies replacement)
-          replaced-jamo-indicies    (get-replaced-jamo-indicies syllable-with-jamo-indicies match-jamo-indicies replacement-jamo-indicies)]
-      (assoc syllable-with-jamo-indicies :syllable (jamo-indicies->syllable replaced-jamo-indicies)))
-    syllable-with-jamo-indicies))
+  [syllable-with-jamo-indices match replacement]
+  (if (:korean-syllable? syllable-with-jamo-indices)
+    (let [match-jamo-indices       (jamo->jamo-indices match)
+          replacement-jamo-indices (jamo->jamo-indices replacement)
+          replaced-jamo-indices    (get-replaced-jamo-indices syllable-with-jamo-indices match-jamo-indices replacement-jamo-indices)]
+      (assoc syllable-with-jamo-indices :syllable (jamo-indices->syllable replaced-jamo-indices)))
+    syllable-with-jamo-indices))
 
 (defn verify-jamo
   [jamo]
@@ -114,8 +114,8 @@
   [s match replacement]
   (verify-jamo match)
   (verify-jamo replacement)
-  (let [syllable-with-jamo-indicies (map ->syllable-with-jamo-indicies s)]
-    (->> (map #(change-syllable % match replacement) syllable-with-jamo-indicies)
+  (let [syllable-with-jamo-indices (map ->syllable-with-jamo-indices s)]
+    (->> (map #(change-syllable % match replacement) syllable-with-jamo-indices)
          (map :syllable)
          (apply str))))
 
